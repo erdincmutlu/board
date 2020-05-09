@@ -6,12 +6,18 @@ import (
 	"github.com/pkg/errors"
 )
 
+type Coord struct {
+	x int
+	y int
+}
+
 var ErrIllegalSizeBoard error = errors.New("Board should be at least 1x1")
 var ErrInvalidDimensionsError error = errors.New("Invalid dimensions")
+var ErrNoItemFound error = errors.New("The board doesn't have item in this coordinate")
 
 // The Board structure to be hold
 type Board struct {
-	items      []uint8
+	items      map[Coord]byte
 	dimensions []int
 }
 
@@ -24,7 +30,7 @@ func NewBoard(n, m int) (*Board, error) {
 
 	fmt.Println("Board initialized")
 	return &Board{
-		items:      []uint8{},
+		items:      map[Coord]byte{},
 		dimensions: []int{n, m},
 	}, nil
 }
@@ -43,4 +49,30 @@ func (b *Board) isInBounds(coord []int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// Helper function, just to get a value from
+func (b *Board) getItem(coord []int) (uint8, error) {
+	inBounds, err := b.isInBounds(coord)
+	if err != nil || !inBounds {
+		return 0, ErrInvalidDimensionsError
+	}
+
+	val, ok := b.items[Coord{x: coord[0], y: coord[1]}]
+	if !ok {
+		return 0, ErrNoItemFound
+	}
+
+	return val, nil
+}
+
+// SetItem sets the item in the given coordinates of the board
+func (b *Board) SetItem(coord []int, item byte) error {
+	inBounds, err := b.isInBounds(coord)
+	if err != nil || !inBounds {
+		return ErrInvalidDimensionsError
+	}
+
+	b.items[Coord{x: coord[0], y: coord[1]}] = item
+	return nil
 }

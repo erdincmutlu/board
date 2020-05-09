@@ -16,7 +16,7 @@ func TestNewBoard(t *testing.T) {
 	require.Equal(t, ErrIllegalSizeBoard, err)
 
 	expBoard := Board{
-		items:      []uint8{},
+		items:      map[Coord]byte{},
 		dimensions: []int{3, 4},
 	}
 	b, err := NewBoard(3, 4)
@@ -73,6 +73,76 @@ func TestIsInBounds(t *testing.T) {
 			}
 
 			require.Equal(t, test.InBounds, inBounds)
+		})
+	}
+}
+
+func TestGetItem(t *testing.T) {
+	testItem := byte('*')
+
+	tests := []struct {
+		name  string
+		coord []int
+		err   error
+		item  byte
+	}{
+		{
+			name:  "Ok",
+			coord: []int{2, 1},
+			item:  testItem,
+		},
+		{
+			name:  "Not inbound",
+			coord: []int{2, 7},
+			err:   ErrInvalidDimensionsError,
+		},
+		{
+			name:  "No item in coordinates",
+			coord: []int{2, 2},
+			err:   ErrNoItemFound,
+		},
+	}
+
+	b, err := NewBoard(3, 5)
+	require.NoError(t, err)
+	b.SetItem([]int{2, 1}, testItem)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			item, err := b.getItem(test.coord)
+			require.True(t, errors.Is(err, test.err))
+			require.Equal(t, test.item, item)
+		})
+	}
+}
+
+func TestSetItem(t *testing.T) {
+	testItem := byte('*')
+
+	tests := []struct {
+		name  string
+		coord []int
+		item  byte
+		err   error
+	}{
+		{
+			name:  "Ok",
+			coord: []int{2, 1},
+		},
+		{
+			name:  "Not inbound",
+			coord: []int{2, 7},
+			err:   ErrInvalidDimensionsError,
+		},
+	}
+
+	b, err := NewBoard(3, 5)
+	require.NoError(t, err)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			err := b.SetItem(test.coord, testItem)
+			require.True(t, errors.Is(err, test.err))
 		})
 	}
 }
