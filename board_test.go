@@ -3,7 +3,6 @@ package board
 import (
 	"testing"
 
-	//"github.com/pkg/errors"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
@@ -16,7 +15,7 @@ func TestNewBoard(t *testing.T) {
 	require.Equal(t, ErrIllegalSizeBoard, err)
 
 	expBoard := Board{
-		items:      map[Coord]byte{},
+		items:      map[coordinates]byte{},
 		dimensions: []int{3, 4},
 	}
 	b, err := NewBoard(3, 4)
@@ -99,13 +98,14 @@ func TestGetItem(t *testing.T) {
 		{
 			name:  "No item in coordinates",
 			coord: []int{2, 2},
-			item:  NO_ITEM,
+			item:  NoItem,
 		},
 	}
 
 	b, err := NewBoard(3, 5)
 	require.NoError(t, err)
-	b.SetItem([]int{2, 1}, testItem)
+	err = b.SetItem([]int{2, 1}, testItem)
+	require.NoError(t, err)
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
