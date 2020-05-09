@@ -99,7 +99,7 @@ func TestGetItem(t *testing.T) {
 		{
 			name:  "No item in coordinates",
 			coord: []int{2, 2},
-			err:   ErrNoItemFound,
+			item:  NO_ITEM,
 		},
 	}
 

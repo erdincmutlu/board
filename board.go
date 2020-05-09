@@ -11,9 +11,12 @@ type Coord struct {
 	y int
 }
 
+const (
+	NO_ITEM = 0
+)
+
 var ErrIllegalSizeBoard error = errors.New("Board should be at least 1x1")
 var ErrInvalidDimensionsError error = errors.New("Invalid dimensions")
-var ErrNoItemFound error = errors.New("The board doesn't have item in this coordinate")
 
 // The Board structure to be hold
 type Board struct {
@@ -60,7 +63,7 @@ func (b *Board) getItem(coord []int) (uint8, error) {
 
 	val, ok := b.items[Coord{x: coord[0], y: coord[1]}]
 	if !ok {
-		return 0, ErrNoItemFound
+		return NO_ITEM, nil
 	}
 
 	return val, nil
