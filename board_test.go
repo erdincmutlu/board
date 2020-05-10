@@ -15,7 +15,7 @@ func TestNewBoard(t *testing.T) {
 	require.Equal(t, ErrIllegalSizeBoard, err)
 
 	expBoard := Board{
-		items:      map[coordinates]byte{},
+		items:      map[twoDCoordinates]byte{},
 		dimensions: []int{3, 4},
 	}
 	b, err := NewBoard(3, 4)
@@ -143,6 +143,81 @@ func TestSetItem(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			err := b.SetItem(test.coord, testItem)
 			require.True(t, errors.Is(err, test.err))
+		})
+	}
+}
+
+func TestIsSet(t *testing.T) {
+	testItem := byte('*')
+	setCoordinate := []int{3, 2}
+
+	tests := []struct {
+		name  string
+		coord []int
+		isSet bool
+	}{
+		{
+			name:  "Set",
+			coord: setCoordinate,
+			isSet: true,
+		},
+		{
+			name:  "Not set",
+			coord: []int{2, 2},
+		},
+		{
+			name:  "Not inbound",
+			coord: []int{2, 7},
+		},
+	}
+
+	b, err := NewBoard(3, 5)
+	require.NoError(t, err)
+	err = b.SetItem(setCoordinate, testItem)
+	require.NoError(t, err)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			isSet := b.IsSet(test.coord)
+			require.Equal(t, test.isSet, isSet)
+		})
+	}
+}
+
+func TestIsEmpty(t *testing.T) {
+	testItem := byte('*')
+	setCoordinate := []int{2, 0}
+
+	tests := []struct {
+		name    string
+		coord   []int
+		isEmpty bool
+	}{
+		{
+			name:    "Empty",
+			coord:   []int{2, 2},
+			isEmpty: true,
+		},
+		{
+			name:  "Not empty",
+			coord: setCoordinate,
+		},
+		{
+			name:    "Not inbound",
+			coord:   []int{2, 7},
+			isEmpty: true,
+		},
+	}
+
+	b, err := NewBoard(3, 5)
+	require.NoError(t, err)
+	err = b.SetItem(setCoordinate, testItem)
+	require.NoError(t, err)
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			isEmpty := b.IsEmpty(test.coord)
+			require.Equal(t, test.isEmpty, isEmpty)
 		})
 	}
 }

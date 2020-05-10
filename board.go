@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type coordinates struct {
+type twoDCoordinates struct {
 	x int
 	y int
 }
@@ -24,7 +24,7 @@ var ErrInvalidDimensionsError error = errors.New("Invalid dimensions")
 
 // The Board structure to be hold
 type Board struct {
-	items      map[coordinates]byte
+	items      map[twoDCoordinates]byte
 	dimensions []int
 }
 
@@ -36,7 +36,7 @@ func NewBoard(n, m int) (*Board, error) {
 	}
 
 	return &Board{
-		items:      map[coordinates]byte{},
+		items:      map[twoDCoordinates]byte{},
 		dimensions: []int{n, m},
 	}, nil
 }
@@ -64,7 +64,7 @@ func (b *Board) getItem(coord []int) (uint8, error) {
 		return 0, ErrInvalidDimensionsError
 	}
 
-	val, ok := b.items[coordinates{x: coord[0], y: coord[1]}]
+	val, ok := b.items[twoDCoordinates{x: coord[0], y: coord[1]}]
 	if !ok {
 		return NoItem, nil
 	}
@@ -79,6 +79,27 @@ func (b *Board) SetItem(coord []int, item byte) error {
 		return ErrInvalidDimensionsError
 	}
 
-	b.items[coordinates{x: coord[0], y: coord[1]}] = item
+	b.items[twoDCoordinates{x: coord[0], y: coord[1]}] = item
 	return nil
+}
+
+// IsSet returns true if the given coordinate is set on board
+func (b *Board) IsSet(coord []int) bool {
+	_, ok := b.items[twoDCoordinates{x: coord[0], y: coord[1]}]
+	if !ok {
+		return false
+	}
+
+	return true
+}
+
+// IsEmpty returns true if the given coordinate is empty or it is out of boundary
+// It is quicker to use !IsSet() in your app if you check the boundaries
+func (b *Board) IsEmpty(coord []int) bool {
+	inBounds, err := b.isInBounds(coord)
+	if err != nil || !inBounds {
+		return true
+	}
+
+	return !b.IsSet(coord)
 }
