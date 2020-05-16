@@ -221,3 +221,7 @@ func TestIsEmpty(t *testing.T) {
 		})
 	}
 }
+
+func TestToFail(t *testing.T) {
+	require.Equal(t, true, false)
+}
